@@ -1,0 +1,107 @@
+ <!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeu du Ballon</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f0f0f0;
+    border-radius: 13px;
+  }
+  #gameCanvas {
+    border: 2px solid #000;
+    background-color: #fff;
+    height: 500px;
+    width: 500px;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="gameCanvas" width="400" height="400"></canvas>
+
+<script>
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const ballSize = 20;
+  let ballX = canvas.width / 2;
+  let ballY = canvas.height - ballSize;
+  let ballSpeedX = 5;
+  let ballSpeedY = -5;
+  let paddleWidth = 100;
+  let paddleHeight = 10;
+  let paddleX = (canvas.width - paddleWidth) / 2;
+  const paddleSpeed = 10;
+  let rightPressed = false;
+  let leftPressed = false;
+
+  function drawBall() {
+    ctx.beginPath();
+    ctx.arc(ballX, ballY, ballSize, 0, Math.PI * 2);
+    ctx.fillStyle = 'pink';
+    ctx.fill();
+    ctx.closePath();
+  }
+
+  function drawPaddle() {
+    ctx.beginPath();
+    ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+    ctx.fillStyle = 'black';
+    ctx.fill();
+    ctx.closePath();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBall();
+    drawPaddle();
+    if (ballX + ballSpeedX > canvas.width - ballSize || ballX + ballSpeedX < ballSize) {
+      ballSpeedX = -ballSpeedX;
+    }
+    if (ballY + ballSpeedY < ballSize) {
+      ballSpeedY = -ballSpeedY;
+    } else if (ballY + ballSpeedY > canvas.height - ballSize) {
+      if (ballX > paddleX && ballX < paddleX + paddleWidth) {
+        ballSpeedY = -ballSpeedY;
+      } else {
+        alert('Game Over!');
+        document.location.reload();
+        clearInterval(interval);
+      }
+    }
+    ballX += ballSpeedX;
+    ballY += ballSpeedY;
+    if (rightPressed && paddleX < canvas.width - paddleWidth) {
+      paddleX += paddleSpeed;
+    } else if (leftPressed && paddleX > 0) {
+      paddleX -= paddleSpeed;
+    }
+  }
+
+  document.addEventListener('keydown', keyDownHandler);
+  document.addEventListener('keyup', keyUpHandler);
+
+  function keyDownHandler(e) {
+    if (e.key === 'Right' || e.key === 'ArrowRight') {
+      rightPressed = true;
+    } else if (e.key === 'Left' || e.key === 'ArrowLeft') {
+      leftPressed = true;
+    }
+  }
+
+  function keyUpHandler(e) {
+    if (e.key === 'Right' || e.key === 'ArrowRight') {
+      rightPressed = false;
+    } else if (e.key === 'Left' || e.key === 'ArrowLeft') {
+      leftPressed = false;
+    }
+  }
+
+  const interval = setInterval(draw, 10);
+</script>
+
+</body>
+</html>
